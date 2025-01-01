@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Fog3211/golang-mongodb-api/config"
+	"github.com/Fog3211/learn-golang-mongodb-api/config"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"

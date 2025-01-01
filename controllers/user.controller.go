@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/Fog3211/golang-mongodb-api/models"
-	"github.com/Fog3211/golang-mongodb-api/services"
+	"github.com/Fog3211/learn-golang-mongodb-api/models"
+	"github.com/Fog3211/learn-golang-mongodb-api/services"
 	"github.com/gin-gonic/gin"
 )
 

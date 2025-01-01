@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Fog3211/golang-mongodb-api/config"
-	"github.com/Fog3211/golang-mongodb-api/services"
-	"github.com/Fog3211/golang-mongodb-api/utils"
+	"github.com/Fog3211/learn-golang-mongodb-api/config"
+	"github.com/Fog3211/learn-golang-mongodb-api/services"
+	"github.com/Fog3211/learn-golang-mongodb-api/utils"
 	"github.com/gin-gonic/gin"
 )
 

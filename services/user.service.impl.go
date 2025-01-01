@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/Fog3211/golang-mongodb-api/models"
+	"github.com/Fog3211/learn-golang-mongodb-api/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

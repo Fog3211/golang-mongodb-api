@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"github.com/Fog3211/golang-mongodb-api/controllers"
-	"github.com/Fog3211/golang-mongodb-api/middleware"
-	"github.com/Fog3211/golang-mongodb-api/services"
+	"github.com/Fog3211/learn-golang-mongodb-api/controllers"
+	"github.com/Fog3211/learn-golang-mongodb-api/middleware"
+	"github.com/Fog3211/learn-golang-mongodb-api/services"
 	"github.com/gin-gonic/gin"
 )
 

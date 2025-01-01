@@ -1,4 +1,4 @@
-module github.com/Fog3211/golang-mongodb-api
+module github.com/Fog3211/learn-golang-mongodb-api
 
 go 1.23.4
 
