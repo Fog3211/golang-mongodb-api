@@ -8,6 +8,10 @@ import (
 	"net/http"
 
 	"github.com/Fog3211/learn-golang-mongodb-api/config"
+	"github.com/Fog3211/learn-golang-mongodb-api/controllers"
+	"github.com/Fog3211/learn-golang-mongodb-api/routes"
+	"github.com/Fog3211/learn-golang-mongodb-api/services"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,27 +19,31 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// ? Create required variables that we'll re-assign later
 var (
 	server      *gin.Engine
 	ctx         context.Context
 	mongoclient *mongo.Client
 	redisclient *redis.Client
+
+	userService         services.UserService
+	UserController      controllers.UserController
+	UserRouteController routes.UserRouteController
+
+	authCollection      *mongo.Collection
+	authService         services.AuthService
+	AuthController      controllers.AuthController
+	AuthRouteController routes.AuthRouteController
 )
 
-// ? Init function that will run before the "main" function
 func init() {
-
-	// ? Load the .env variables
 	config, err := config.LoadConfig(".")
 	if err != nil {
 		log.Fatal("Could not load environment variables", err)
 	}
 
-	// ? Create a context
 	ctx = context.TODO()
 
-	// ? Connect to MongoDB
+	// Connect to MongoDB
 	mongoconn := options.Client().ApplyURI(config.DBUri)
 	mongoclient, err := mongo.Connect(ctx, mongoconn)
 
@@ -49,7 +57,7 @@ func init() {
 
 	fmt.Println("MongoDB successfully connected...")
 
-	// ? Connect to Redis
+	// Connect to Redis
 	redisclient = redis.NewClient(&redis.Options{
 		Addr: config.RedisUri,
 	})
@@ -65,7 +73,16 @@ func init() {
 
 	fmt.Println("Redis client connected successfully...")
 
-	// ? Create the Gin Engine instance
+	// Collections
+	authCollection = mongoclient.Database("golang_mongodb").Collection("users")
+	userService = services.NewUserServiceImpl(authCollection, ctx)
+	authService = services.NewAuthService(authCollection, ctx)
+	AuthController = controllers.NewAuthController(authService, userService)
+	AuthRouteController = routes.NewAuthRouteController(AuthController)
+
+	UserController = controllers.NewUserController(userService)
+	UserRouteController = routes.NewRouteUserController(UserController)
+
 	server = gin.Default()
 }
 
@@ -86,10 +103,18 @@ func main() {
 		panic(err)
 	}
 
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = []string{"http://localhost:8000", "http://localhost:3000"}
+	corsConfig.AllowCredentials = true
+
+	server.Use(cors.New(corsConfig))
+
 	router := server.Group("/api")
 	router.GET("/healthchecker", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": value})
 	})
 
+	AuthRouteController.AuthRoute(router, userService)
+	UserRouteController.UserRoute(router, userService)
 	log.Fatal(server.Run(":" + config.Port))
 }
