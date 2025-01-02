@@ -2,13 +2,14 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/Fog3211/learn-golang-mongodb-api/config"
 	"github.com/Fog3211/learn-golang-mongodb-api/controllers"
+	"github.com/Fog3211/learn-golang-mongodb-api/middleware"
 	"github.com/Fog3211/learn-golang-mongodb-api/routes"
 	"github.com/Fog3211/learn-golang-mongodb-api/services"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -51,15 +52,28 @@ func init() {
 		panic(err)
 	}
 
+	fmt.Println("MongoDB successfully connected...")
+
 	// Connect to Redis
 	redisclient = redis.NewClient(&redis.Options{
 		Addr: config.RedisUri,
 	})
 
+	if _, err := redisclient.Ping(ctx).Result(); err != nil {
+		panic(err)
+	}
+
+	err = redisclient.Set(ctx, "test", "Welcome to Golang with Redis and MongoDB", 0).Err()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Redis client connected successfully...")
+
 	// Collections
 	authCollection = mongoclient.Database("golang_mongodb").Collection("users")
 	userService = services.NewUserServiceImpl(authCollection, ctx)
-	authService = services.NewAuthService(authCollection, ctx)
+	authService = services.NewAuthServiceImpl(authCollection, ctx)
 	AuthController = controllers.NewAuthController(authService, userService)
 	AuthRouteController = routes.NewAuthRouteController(AuthController)
 
@@ -76,11 +90,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func setupServer() {
-	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"*"}
-	corsConfig.AllowCredentials = true
-
-	server.Use(cors.New(corsConfig))
+	server.Use(middleware.CorsMiddleware())
 
 	router := server.Group("/api")
 	router.GET("/healthchecker", func(ctx *gin.Context) {
