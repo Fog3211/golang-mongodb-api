@@ -16,5 +16,6 @@ A robust authentication service built with Go, featuring MongoDB integration and
 - Go 1.19 or higher
 - MongoDB
 - Make (optional, for using Makefile commands)
+- Vercel CLI (for deployment)
 
 ## Project Structure
